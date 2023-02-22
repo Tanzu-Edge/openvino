@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: openvino
+  name: openvino
+spec:
+  containers:
+  - args:
+    - bash
+    - -c
+    - cd / && sudo git clone https://github.com/Tanzu-Edge/face_mask_detection_openvino.git && cd /face_mask_detection_openvino && source /opt/intel/openvino/bin/setupvars.sh && python3 face_mask.py --debug --show-bbox -i cam --height 576 --width 1024
+    volumeMounts:
+    - mountPath: /dev
+      name: devdir
+    - mountPath: /sys
+      name: sysdir
+    image: gcr.io/pa-mbrodi/openvino/face_mask_detection_openvino:mwc
+    name: openvino
+    securityContext:
+       privileged: true
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  hostNetwork: true
+  nodeName: kc-smc-e100
+  volumes:
+  - name: sysdir
+    hostPath:
+      path: /sys
+      type: Directory
+  - name: devdir
+    hostPath:
+      path: /dev
+      type: Directory
+status: {}
